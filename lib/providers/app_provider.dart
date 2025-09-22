@@ -6,6 +6,7 @@ class AppProvider extends ChangeNotifier {
   List<SmsMessage> _smsMessages = [];
   List<CallLog> _callLogs = [];
   List<Contact> _contacts = [];
+  List<App> _apps = [];
   List<String> _blockedNumbers = [];
   bool _isLoading = false;
   bool _serviceRunning = false;
@@ -15,6 +16,7 @@ class AppProvider extends ChangeNotifier {
   List<SmsMessage> get smsMessages => _smsMessages;
   List<CallLog> get callLogs => _callLogs;
   List<Contact> get contacts => _contacts;
+  List<App> get apps => _apps;
   List<String> get blockedNumbers => _blockedNumbers;
   bool get isLoading => _isLoading;
   bool get serviceRunning => _serviceRunning;
@@ -85,6 +87,27 @@ class AppProvider extends ChangeNotifier {
       _contacts = data.map((e) => Contact.fromMap(e)).toList();
     } catch (e) {
       print('Error loading contacts: $e');
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // Load installed apps
+  Future<void> loadApps() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final List<Map<String, dynamic>> data =
+          await NativeService.getInstalledApps();
+      _apps = data.map((e) => App.fromMap(e)).toList();
+      // Sort apps alphabetically by name
+      _apps.sort(
+        (a, b) => a.appName.toLowerCase().compareTo(b.appName.toLowerCase()),
+      );
+    } catch (e) {
+      print('Error loading apps: $e');
     }
 
     _isLoading = false;
@@ -196,5 +219,8 @@ class AppProvider extends ChangeNotifier {
         loadBlockedNumbers(),
       ]);
     }
+
+    // Load apps separately as it doesn't require special permissions
+    await loadApps();
   }
 }

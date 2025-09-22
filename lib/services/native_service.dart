@@ -51,6 +51,19 @@ class NativeService {
     }
   }
 
+  // Get installed apps
+  static Future<List<Map<String, dynamic>>> getInstalledApps() async {
+    try {
+      final List<dynamic> result = await _channel.invokeMethod(
+        'getInstalledApps',
+      );
+      return result.map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (e) {
+      print('Error getting installed apps: $e');
+      return [];
+    }
+  }
+
   // Block a number
   static Future<bool> blockNumber(String number) async {
     try {

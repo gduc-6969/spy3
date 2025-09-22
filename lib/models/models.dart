@@ -85,3 +85,39 @@ class Contact {
     return Contact(name: map['name'] ?? '', number: map['number'] ?? '');
   }
 }
+
+class App {
+  final String packageName;
+  final String appName;
+  final String version;
+  final bool isSystemApp;
+  final int installTime;
+
+  App({
+    required this.packageName,
+    required this.appName,
+    required this.version,
+    required this.isSystemApp,
+    required this.installTime,
+  });
+
+  factory App.fromMap(Map<String, dynamic> map) {
+    return App(
+      packageName: map['packageName'] ?? '',
+      appName: map['appName'] ?? '',
+      version: map['version'] ?? '',
+      isSystemApp: map['isSystemApp'] ?? false,
+      installTime: map['installTime'] ?? 0,
+    );
+  }
+
+  String get formattedInstallDate {
+    if (installTime == 0) return 'Unknown';
+    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(installTime);
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  String get appType {
+    return isSystemApp ? 'System' : 'User';
+  }
+}

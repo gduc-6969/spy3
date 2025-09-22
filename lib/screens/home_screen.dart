@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
+import '../models/models.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SmsTab(),
           CallsTab(),
           ContactsTab(),
+          AppsTab(),
           BlockedTab(),
         ],
       ),
@@ -90,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.contacts),
             label: 'Contacts',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Apps'),
           BottomNavigationBarItem(icon: Icon(Icons.block), label: 'Blocked'),
         ],
       ),
@@ -222,20 +225,21 @@ class DashboardTab extends StatelessWidget {
               const SizedBox(height: 16),
               Expanded(
                 child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.8,
                   children: [
                     _buildStatCard(
                       context,
-                      'SMS Messages',
+                      'SMS',
                       provider.smsMessages.length.toString(),
                       Icons.sms,
                       Colors.blue,
                     ),
                     _buildStatCard(
                       context,
-                      'Call Logs',
+                      'Calls',
                       provider.callLogs.length.toString(),
                       Icons.call,
                       Colors.green,
@@ -249,7 +253,14 @@ class DashboardTab extends StatelessWidget {
                     ),
                     _buildStatCard(
                       context,
-                      'Blocked Numbers',
+                      'Apps',
+                      provider.apps.length.toString(),
+                      Icons.apps,
+                      Colors.purple,
+                    ),
+                    _buildStatCard(
+                      context,
+                      'Blocked',
                       provider.blockedNumbers.length.toString(),
                       Icons.block,
                       Colors.red,
@@ -273,24 +284,27 @@ class DashboardTab extends StatelessWidget {
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: color),
-            const SizedBox(height: 8),
+            Icon(icon, size: 36, color: color),
+            const SizedBox(height: 6),
             Text(
               count,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
@@ -654,6 +668,214 @@ class BlockedTab extends StatelessWidget {
             },
             child: const Text('Unblock'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class AppsTab extends StatelessWidget {
+  const AppsTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AppProvider>(
+      builder: (context, provider, child) {
+        return Scaffold(
+          body: _buildBody(context, provider),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              await provider.loadApps();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Apps list refreshed')),
+              );
+            },
+            child: const Icon(Icons.refresh),
+            tooltip: 'Get Installed Apps',
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(BuildContext context, AppProvider provider) {
+    if (provider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.apps.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.apps, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No apps found',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Tap the refresh button to load apps',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const Icon(Icons.apps, color: Colors.blue),
+              const SizedBox(width: 8),
+              Text(
+                'Installed Apps (${provider.apps.length})',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: provider.apps.length,
+            itemBuilder: (context, index) {
+              final app = provider.apps[index];
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: app.isSystemApp
+                        ? Colors.orange
+                        : Colors.blue,
+                    child: Icon(
+                      app.isSystemApp ? Icons.settings : Icons.android,
+                      color: Colors.white,
+                    ),
+                  ),
+                  title: Text(
+                    app.appName,
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        app.packageName,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: app.isSystemApp
+                                  ? Colors.orange.withOpacity(0.2)
+                                  : Colors.blue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              app.appType,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: app.isSystemApp
+                                    ? Colors.orange[800]
+                                    : Colors.blue[800],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'v${app.version}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        app.formattedInstallDate,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  onTap: () => _showAppDetails(context, app),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showAppDetails(BuildContext context, App app) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(app.appName),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow('Package Name', app.packageName),
+            _buildDetailRow('Version', app.version),
+            _buildDetailRow('Type', app.appType),
+            _buildDetailRow('Install Date', app.formattedInstallDate),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );

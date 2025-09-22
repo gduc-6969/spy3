@@ -5,6 +5,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -61,6 +63,9 @@ public class MainActivity extends FlutterActivity {
                 break;
             case "getContacts":
                 getContacts(result);
+                break;
+            case "getInstalledApps":
+                getInstalledApps(result);
                 break;
             case "blockNumber":
                 String numberToBlock = call.argument("number");
@@ -310,5 +315,49 @@ public class MainActivity extends FlutterActivity {
         // For older Android versions or if call screening is not available
         // Still return success so the blocking service can work with reflection method
         result.success(true);
+    }
+    
+    private void getInstalledApps(MethodChannel.Result result) {
+        try {
+            PackageManager packageManager = getPackageManager();
+            List<PackageInfo> packages = packageManager.getInstalledPackages(PackageManager.GET_META_DATA);
+            List<Map<String, Object>> appsList = new ArrayList<>();
+            
+            for (PackageInfo packageInfo : packages) {
+                ApplicationInfo appInfo = packageInfo.applicationInfo;
+                
+                // Get app name
+                String appName = packageManager.getApplicationLabel(appInfo).toString();
+                
+                // Get package name
+                String packageName = packageInfo.packageName;
+                
+                // Get version
+                String version = packageInfo.versionName != null ? packageInfo.versionName : "Unknown";
+                
+                // Check if it's a system app
+                boolean isSystemApp = (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+                
+                // Get install time
+                long installTime = packageInfo.firstInstallTime;
+                
+                // Create app data map
+                Map<String, Object> appData = new HashMap<>();
+                appData.put("packageName", packageName);
+                appData.put("appName", appName);
+                appData.put("version", version);
+                appData.put("isSystemApp", isSystemApp);
+                appData.put("installTime", installTime);
+                
+                appsList.add(appData);
+            }
+            
+            Log.d("MainActivity", "Found " + appsList.size() + " installed apps");
+            result.success(appsList);
+            
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error getting installed apps: " + e.getMessage(), e);
+            result.error("APPS_ERROR", "Failed to get installed apps: " + e.getMessage(), null);
+        }
     }
 }
