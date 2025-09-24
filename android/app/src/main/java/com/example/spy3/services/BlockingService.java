@@ -8,7 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
+
 import android.os.Build;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
@@ -117,15 +117,5 @@ public class BlockingService extends Service {
         }
     }
     
-    // Helper method to check if service is running
-    public static boolean isServiceRunning(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("service_state", Context.MODE_PRIVATE);
-        return prefs.getBoolean("blocking_service_running", false);
-    }
-    
-    // Helper method to set service running state
-    private void setServiceRunningState(boolean running) {
-        SharedPreferences prefs = getSharedPreferences("service_state", Context.MODE_PRIVATE);
-        prefs.edit().putBoolean("blocking_service_running", running).apply();
-    }
+
 }

@@ -11,7 +11,6 @@ class NativeService {
       final bool result = await _channel.invokeMethod('requestPermissions');
       return result;
     } catch (e) {
-      print('Error requesting permissions: $e');
       return false;
     }
   }
@@ -24,7 +23,6 @@ class NativeService {
       );
       return result.map((e) => Map<String, dynamic>.from(e)).toList();
     } catch (e) {
-      print('Error getting SMS messages: $e');
       return [];
     }
   }
@@ -35,7 +33,6 @@ class NativeService {
       final List<dynamic> result = await _channel.invokeMethod('getCallLogs');
       return result.map((e) => Map<String, dynamic>.from(e)).toList();
     } catch (e) {
-      print('Error getting call logs: $e');
       return [];
     }
   }
@@ -46,7 +43,6 @@ class NativeService {
       final List<dynamic> result = await _channel.invokeMethod('getContacts');
       return result.map((e) => Map<String, dynamic>.from(e)).toList();
     } catch (e) {
-      print('Error getting contacts: $e');
       return [];
     }
   }
@@ -59,7 +55,6 @@ class NativeService {
       );
       return result.map((e) => Map<String, dynamic>.from(e)).toList();
     } catch (e) {
-      print('Error getting installed apps: $e');
       return [];
     }
   }
@@ -72,7 +67,6 @@ class NativeService {
       });
       return result;
     } catch (e) {
-      print('Error blocking number: $e');
       return false;
     }
   }
@@ -85,7 +79,6 @@ class NativeService {
       });
       return result;
     } catch (e) {
-      print('Error unblocking number: $e');
       return false;
     }
   }
@@ -98,7 +91,6 @@ class NativeService {
       );
       return result.map((e) => e.toString()).toList();
     } catch (e) {
-      print('Error getting blocked numbers: $e');
       return [];
     }
   }
@@ -109,7 +101,6 @@ class NativeService {
       final bool result = await _channel.invokeMethod('startBlockingService');
       return result;
     } catch (e) {
-      print('Error starting blocking service: $e');
       return false;
     }
   }
@@ -120,7 +111,6 @@ class NativeService {
       final bool result = await _channel.invokeMethod('stopBlockingService');
       return result;
     } catch (e) {
-      print('Error stopping blocking service: $e');
       return false;
     }
   }
@@ -131,7 +121,6 @@ class NativeService {
       final bool result = await _channel.invokeMethod('enableCallScreening');
       return result;
     } catch (e) {
-      print('Error enabling call screening: $e');
       return false;
     }
   }

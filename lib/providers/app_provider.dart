@@ -30,7 +30,6 @@ class AppProvider extends ChangeNotifier {
     try {
       _permissionsGranted = await NativeService.requestPermissions();
     } catch (e) {
-      print('Error requesting permissions: $e');
       _permissionsGranted = false;
     }
 
@@ -50,7 +49,7 @@ class AppProvider extends ChangeNotifier {
           await NativeService.getSmsMessages();
       _smsMessages = data.map((e) => SmsMessage.fromMap(e)).toList();
     } catch (e) {
-      print('Error loading SMS messages: $e');
+      // Handle error silently
     }
 
     _isLoading = false;
@@ -68,7 +67,7 @@ class AppProvider extends ChangeNotifier {
       final List<Map<String, dynamic>> data = await NativeService.getCallLogs();
       _callLogs = data.map((e) => CallLog.fromMap(e)).toList();
     } catch (e) {
-      print('Error loading call logs: $e');
+      // Handle error silently
     }
 
     _isLoading = false;
@@ -86,7 +85,7 @@ class AppProvider extends ChangeNotifier {
       final List<Map<String, dynamic>> data = await NativeService.getContacts();
       _contacts = data.map((e) => Contact.fromMap(e)).toList();
     } catch (e) {
-      print('Error loading contacts: $e');
+      // Handle error silently
     }
 
     _isLoading = false;
@@ -107,7 +106,7 @@ class AppProvider extends ChangeNotifier {
         (a, b) => a.appName.toLowerCase().compareTo(b.appName.toLowerCase()),
       );
     } catch (e) {
-      print('Error loading apps: $e');
+      // Handle error silently
     }
 
     _isLoading = false;
@@ -122,7 +121,7 @@ class AppProvider extends ChangeNotifier {
     try {
       _blockedNumbers = await NativeService.getBlockedNumbers();
     } catch (e) {
-      print('Error loading blocked numbers: $e');
+      // Handle error silently
     }
 
     _isLoading = false;
@@ -139,7 +138,6 @@ class AppProvider extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error blocking number: $e');
       return false;
     }
   }
@@ -154,7 +152,6 @@ class AppProvider extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error unblocking number: $e');
       return false;
     }
   }
@@ -169,7 +166,6 @@ class AppProvider extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error starting blocking service: $e');
       return false;
     }
   }
@@ -184,7 +180,6 @@ class AppProvider extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error stopping blocking service: $e');
       return false;
     }
   }
@@ -200,7 +195,6 @@ class AppProvider extends ChangeNotifier {
       final bool success = await NativeService.enableCallScreening();
       return success;
     } catch (e) {
-      print('Error enabling call screening: $e');
       return false;
     }
   }

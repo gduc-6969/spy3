@@ -13,8 +13,7 @@ import android.os.Build;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
-import android.telephony.SmsManager;
-import android.widget.Toast;
+
 import android.telecom.TelecomManager;
 import android.app.role.RoleManager;
 import android.util.Log;

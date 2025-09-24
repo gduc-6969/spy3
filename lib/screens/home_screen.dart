@@ -3,6 +3,61 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../models/models.dart';
 
+// Helper class for common dialogs
+class DialogHelper {
+  static void showBlockDialog(BuildContext context, String number) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Block Number'),
+        content: Text('Do you want to block $number?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await context.read<AppProvider>().blockNumber(number);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Blocked $number')));
+            },
+            child: const Text('Block'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void showUnblockDialog(BuildContext context, String number) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Unblock Number'),
+        content: Text('Do you want to unblock $number?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await context.read<AppProvider>().unblockNumber(number);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Unblocked $number')));
+            },
+            child: const Text('Unblock'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -375,36 +430,11 @@ class SmsTab extends StatelessWidget {
               ? Icon(Icons.block, color: Colors.red)
               : IconButton(
                   icon: const Icon(Icons.block),
-                  onPressed: () => _showBlockDialog(context, sms.address),
+                  onPressed: () =>
+                      DialogHelper.showBlockDialog(context, sms.address),
                 ),
         );
       },
-    );
-  }
-
-  void _showBlockDialog(BuildContext context, String number) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Block Number'),
-        content: Text('Do you want to block $number?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await context.read<AppProvider>().blockNumber(number);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Blocked $number')));
-            },
-            child: const Text('Block'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -468,7 +498,8 @@ class CallsTab extends StatelessWidget {
               ? Icon(Icons.block, color: Colors.red)
               : IconButton(
                   icon: const Icon(Icons.block),
-                  onPressed: () => _showBlockDialog(context, call.number),
+                  onPressed: () =>
+                      DialogHelper.showBlockDialog(context, call.number),
                 ),
         );
       },
@@ -495,32 +526,6 @@ class CallsTab extends StatelessWidget {
       default:
         return Icons.call_received; // Incoming
     }
-  }
-
-  void _showBlockDialog(BuildContext context, String number) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Block Number'),
-        content: Text('Do you want to block $number?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await context.read<AppProvider>().blockNumber(number);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Blocked $number')));
-            },
-            child: const Text('Block'),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -575,36 +580,11 @@ class ContactsTab extends StatelessWidget {
               ? Icon(Icons.block, color: Colors.red)
               : IconButton(
                   icon: const Icon(Icons.block),
-                  onPressed: () => _showBlockDialog(context, contact.number),
+                  onPressed: () =>
+                      DialogHelper.showBlockDialog(context, contact.number),
                 ),
         );
       },
-    );
-  }
-
-  void _showBlockDialog(BuildContext context, String number) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Block Number'),
-        content: Text('Do you want to block $number?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await context.read<AppProvider>().blockNumber(number);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Blocked $number')));
-            },
-            child: const Text('Block'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -638,38 +618,13 @@ class BlockedTab extends StatelessWidget {
               subtitle: const Text('Blocked number'),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: () => _showUnblockDialog(context, number),
+                onPressed: () =>
+                    DialogHelper.showUnblockDialog(context, number),
               ),
             );
           },
         );
       },
-    );
-  }
-
-  void _showUnblockDialog(BuildContext context, String number) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Unblock Number'),
-        content: Text('Do you want to unblock $number?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await context.read<AppProvider>().unblockNumber(number);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Unblocked $number')));
-            },
-            child: const Text('Unblock'),
-          ),
-        ],
-      ),
     );
   }
 }
